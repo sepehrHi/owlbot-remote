@@ -29,6 +29,7 @@ dependencies = [
     "pywifi",
     "wmi",
     "pycaw",
+    "pyaudio",
 ]
 
 [tool.setuptools]
