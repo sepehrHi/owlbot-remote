@@ -26,24 +26,11 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install twine tools
-        run: pip install twine
+      - name: Install build tools
+        run: pip install build
 
-      - name: Download release assets (whl)
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir dist
-          gh release download ${{ github.event.release.tag_name }} \
-            --repo ${{ github.repository }} \
-            --pattern "*.whl" \
-            --dir dist
-
-      - name: Build sdist (optional)
-        run: |
-          pip install build
-          python -m build --sdist
-          cp dist/*.tar.gz dist/ || true
+      - name: Build distribution
+        run: python -m build
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
