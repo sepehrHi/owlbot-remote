@@ -22,18 +22,22 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
       - name: Install build tools
-        run: pip install build
+        run: pip install build twine
 
       - name: Build distribution
         run: python -m build
 
       - name: Verify dist
         run: ls -la dist/
+
+      - name: Verify package metadata (twine check)
+        run: twine check dist/*
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
