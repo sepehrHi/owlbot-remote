@@ -1,0 +1,23 @@
+# OwlBot Remote
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+*.tar.gz
+.tox/
+.nox/
+.eggs/
+*.log
+.env
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+

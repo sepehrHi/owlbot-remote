@@ -16,26 +16,27 @@ jobs:
       name: pypi
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
       - name: Install build tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install build
+        run: pip install build
 
       - name: Build distribution
         run: python -m build
 
-      - name: Check dist files
+      - name: Verify dist
         run: ls -la dist/
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
+          # Uses trusted publishing (OIDC) — no username / password needed
