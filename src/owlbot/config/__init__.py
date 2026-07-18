@@ -10,7 +10,7 @@ from typing import FrozenSet, List, Optional
 
 AVAILABLE_MODULES = frozenset({
     "system", "screen", "audio", "files",
-    "input", "processes", "monitoring", "network",
+    "input", "processes", "monitoring", "network", "ffmpeg",
 })
 
 #: Modules that only make sense on Windows (need Win32-only optional deps).
