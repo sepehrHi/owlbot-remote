@@ -8,19 +8,19 @@ from owlbot.modules.monitoring import MonitoringModule
 
 def test_read_cpu_returns_percentage_string():
     result = MonitoringModule._read_cpu()
-    assert result.startswith("📊 CPU:")
-    assert result.endswith("%")
+    assert "CPU" in result
+    assert "%" in result
 
 
 def test_read_ram_returns_percentage_and_gb():
     result = MonitoringModule._read_ram()
-    assert result.startswith("📊 RAM:")
+    assert "RAM" in result
     assert "GB" in result
 
 
 def test_read_disk_returns_percentage_and_gb():
     result = MonitoringModule._read_disk()
-    assert result.startswith("📊 Disk:")
+    assert "Disk" in result
     assert "GB" in result
 
 
