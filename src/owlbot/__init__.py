@@ -3,8 +3,8 @@
 from owlbot.config import BotConfig
 from owlbot.core.bot import OwlBot
 
-__version__ = "1.0.0b0"
-__author__ = "MR_owl"
+__version__ = "1.0.1"
+__author__ = "Sepehr H.I"
 __license__ = "MIT"
 
 __all__ = ["OwlBot", "BotConfig"]
