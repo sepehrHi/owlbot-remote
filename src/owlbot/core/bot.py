@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import logging
 import sys
+import time
 from typing import List, Optional
 
 from owlbot.config import AVAILABLE_MODULES, BotConfig
+from owlbot.core.utils import internet_ok
 from owlbot.platform.telegram import TelegramPlatform
 
 
@@ -109,17 +111,65 @@ class OwlBot:
 
         logger.info("OwlBot initialized successfully.")
 
+    def _startup_report(self, tg_bot: object, uid: int) -> None:
+        """
+        Send an animated startup status card: connectivity → FFmpeg → ready.
+        Falls back silently to a static message if editing fails.
+        """
+        frames = ["🦉 *Waking up…* ⏳", "🦉 *Waking up…* ⏳⏳", "🦉 *Waking up…* ⏳⏳⏳"]
+        msg = None
+        try:
+            msg = tg_bot.send_message(uid, frames[0], parse_mode="Markdown")  # type: ignore[attr-defined]
+            for frame in frames[1:]:
+                time.sleep(0.35)
+                tg_bot.edit_message_text(  # type: ignore[attr-defined]
+                    frame, chat_id=uid, message_id=msg.message_id, parse_mode="Markdown"
+                )
+        except Exception:
+            logger.debug("Startup animation skipped (non-fatal).", exc_info=True)
+
+        net_ok = internet_ok()
+        net_line = "🌐 Internet — ✅ connected" if net_ok else "🌐 Internet — ⚠️ no connection detected"
+
+        ffmpeg_line = ""
+        if "ffmpeg" in self.config.modules:
+            try:
+                from owlbot.modules.ffmpeg import check_ffmpeg
+                ok, detail = check_ffmpeg()
+                ffmpeg_line = (
+                    f"🎬 FFmpeg — ✅ {detail.splitlines()[0]}" if ok
+                    else "🎬 FFmpeg — ❌ not found (run /ffmpeg_install)"
+                )
+            except Exception:
+                ffmpeg_line = "🎬 FFmpeg — ⚠️ check failed"
+
+        modules_line = "🧩 Modules — " + ", ".join(sorted(self.config.modules))
+
+        lines = ["🟢 *OwlBot is online!*", "─────────────────────", net_line]
+        if ffmpeg_line:
+            lines.append(ffmpeg_line)
+        lines.append(modules_line)
+        lines.append("")
+        lines.append("Type `/help` for commands.")
+        final_text = "\n".join(lines)
+
+        try:
+            if msg is not None:
+                tg_bot.edit_message_text(  # type: ignore[attr-defined]
+                    final_text, chat_id=uid, message_id=msg.message_id, parse_mode="Markdown"
+                )
+            else:
+                tg_bot.send_message(uid, final_text, parse_mode="Markdown")  # type: ignore[attr-defined]
+        except Exception:
+            logger.warning("Could not send final startup status to user %s", uid, exc_info=True)
+
     def run(self) -> None:
         """Start the bot."""
         try:
             for uid in self.config.authorized_users:
                 try:
                     if hasattr(self._platform, "_bot"):
-                        self._platform._bot.send_message(
-                            uid,
-                            "🟢 **Owl Bot is online!**\n\nType `/help` for commands.",
-                            parse_mode="Markdown",
-                        )
+                        self._startup_report(self._platform._bot, uid)
                 except Exception:
                     logger.warning(
                         "Could not send startup notification to user %s", uid, exc_info=True
