@@ -61,6 +61,7 @@ dev = [
     "build>=1.0.0",
     "wheel>=0.40.0",
     "flake8>=6.0.0",
+    "mypy>=1.8.0",
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
 ]
@@ -81,11 +82,18 @@ include = ["owlbot", "owlbot.*"]
 [tool.setuptools.package-data]
 "owlbot" = ["py.typed"]
 
-[tool.flake8]
-max-line-length = 127
-max-complexity = 12
-exclude = [".git", "__pycache__", "build", "dist", "*.egg-info"]
+# NOTE: flake8 does not read [tool.flake8] from pyproject.toml — it is
+# configured in .flake8 at the repo root instead. This section is
+# intentionally absent here to avoid a dead/misleading duplicate config.
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+exclude = ["tests/", "build/", "dist/"]

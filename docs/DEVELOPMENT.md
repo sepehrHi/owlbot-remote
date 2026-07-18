@@ -139,68 +139,74 @@ def test_config_defaults():
 
 ### Fixtures (conftest.py)
 
+OwlBot uses `pyTelegramBotAPI`, which is **synchronous** — there is no
+`asyncio`/`AsyncMock` anywhere in this codebase. The actual shared fixtures
+currently in `tests/conftest.py` are:
+
 ```python
-# tests/conftest.py
+# tests/conftest.py (actual, simplified)
 import pytest
-from unittest.mock import AsyncMock
-from owlbot import OwlBot
-from owlbot.config import BotConfig
 
 @pytest.fixture
-def bot_config():
-    return BotConfig(
-        token="123456:TEST_TOKEN",
-        authorized_users=[123456789],
-        enable_logging=False,
-    )
+def valid_token() -> str:
+    """A syntactically valid (but fake) Telegram bot token."""
+    return "123456789:AAFakeTokenFakeTokenFakeTokenFakeTok"
 
 @pytest.fixture
-def bot(bot_config):
-    return OwlBot(config=bot_config)
+def valid_users() -> list:
+    """A list with one authorized user id."""
+    return [111111111]
 
-@pytest.fixture
-def mock_ctx():
-    ctx = AsyncMock()
-    ctx.user_id = 123456789
-    ctx.chat_id = 123456789
-    ctx.args = ""
-    return ctx
+@pytest.fixture(autouse=True)
+def _reset_owlbot_logging():
+    """Give every test a clean 'owlbot' logger (no leaked handlers)."""
+    ...
 ```
+
+Individual test files build their own `BotConfig`/mock `message` objects
+locally (see `tests/test_bot.py`, `tests/test_config.py`) rather than
+relying on a shared `bot`/`mock_ctx` fixture.
 
 ### Mocking External Dependencies
 
 ```python
 # Mock psutil for cross-platform tests
-@pytest.fixture(autouse=True)
-def mock_psutil(monkeypatch):
+def test_read_cpu_returns_percentage_string(monkeypatch):
     import psutil
     monkeypatch.setattr(psutil, "cpu_percent", lambda *a, **k: 42.0)
-    monkeypatch.setattr(psutil, "virtual_memory", lambda: ...)
+    ...
 
-# Mock Telegram API
-@pytest.fixture
-def mock_telegram(monkeypatch):
-    import telebot
-    monkeypatch.setattr(telebot, "TeleBot", AsyncMock)
+# Mock a Telegram message (plain object/MagicMock, not AsyncMock — the
+# library is synchronous)
+from unittest.mock import MagicMock
+
+def make_message(chat_id: int, text: str = "") -> MagicMock:
+    message = MagicMock()
+    message.chat.id = chat_id
+    message.text = text
+    return message
 ```
 
 ---
 
 ## 🎨 Code Style
 
-### Linting & Formatting
+### Linting & Type Checking
 
 ```bash
-# Lint (CI uses this)
+# Lint (CI enforces this — see .github/workflows/python-package.yml)
 flake8 src tests
 
-# Format (recommended)
-black src tests
-isort src tests
-
-# Type checking
+# Type checking (advisory in CI, not yet blocking — see [tool.mypy] in pyproject.toml)
 mypy src
 ```
+
+> Note: `black` and `isort` are **not** currently part of this project's
+> toolchain (no config, no dev dependency, not run in CI). If you'd like to
+> adopt them, add them to `[project.optional-dependencies].dev` in
+> `pyproject.toml` and to `.pre-commit-config.yaml` first, then run a
+> dedicated formatting-only commit so it doesn't get mixed with logic
+> changes.
 
 ### Configuration
 
@@ -210,16 +216,17 @@ mypy src
 max-line-length = 127
 max-complexity = 12
 exclude = .git,__pycache__,build,dist,.venv,*.egg-info
+```
 
+```toml
 # pyproject.toml (partial)
-[tool.black]
-line-length = 127
-target-version = ['py311']
-include = '\.pyi?$'
-
-[tool.isort]
-profile = "black"
-line_length = 127
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+exclude = ["tests/", "build/", "dist/"]
 ```
 
 ### Style Rules
@@ -234,27 +241,25 @@ line_length = 127
 | Docstrings | Google style (PEP 257) |
 | Naming | `snake_case` functions, `PascalCase` classes, `UPPER_CASE` constants |
 
-### Pre-commit Hooks (Optional)
+### Pre-commit Hooks (Optional, not yet set up)
+
+There is no `.pre-commit-config.yaml` in the repo yet. If you want local
+pre-commit checks, create one yourself, e.g.:
 
 ```bash
 pip install pre-commit
-pre-commit install
+```
 
-# .pre-commit-config.yaml
+```yaml
+# .pre-commit-config.yaml (example — create this file to enable)
 repos:
-  - repo: https://github.com/psf/black
-    rev: 24.3.0
-    hooks:
-      - id: black
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
   - repo: https://github.com/pycqa/flake8
     rev: 7.0.0
     hooks:
       - id: flake8
 ```
+
+Then run `pre-commit install`.
 
 ---
 
@@ -363,86 +368,78 @@ Semantic Versioning (SemVer): `MAJOR.MINOR.PATCH`
 
 ### Release Checklist
 
+This is the actual process the maintainer follows (no manual `twine
+upload` — publishing to PyPI is automated via GitHub's trusted OIDC
+publishing once a GitHub Release is created).
+
 ```bash
-# 1. Update version
-# pyproject.toml: version = "1.1.0"
+# 1. Bump version in BOTH places (they must match)
+# pyproject.toml:        version = "1.1.0"
 # src/owlbot/__init__.py: __version__ = "1.1.0"
 
 # 2. Update CHANGELOG.md
-# ## [1.1.0] - 2024-01-15
+# ## [1.1.0] - 2026-XX-XX
 # ### Added
-# - Weather module
+# - ...
+# ...and add the compare link at the bottom:
+# [1.1.0]: https://github.com/sepehrHi/OwlBot/compare/v1.0.1...v1.1.0
 
-# 3. Run tests
-pytest -v
-flake8 src tests
-mypy src
+# 3. Add RELEASE_NOTES_v1.1.0.md (see RELEASE_NOTES_v1.0.1.md for the format)
 
-# 4. Build
-pip install build
+# 4. Re-sync the local editable install metadata after the version bump
+pip install -e ".[dev]"
+
+# 5. Run the same checks CI runs
+flake8 src tests --count --select=E9,F63,F7,F82 --show-source --statistics
+flake8 src tests --count --exit-zero --statistics
+mypy src            # advisory only, does not block release
+pytest -v --cov=owlbot --cov-report=term-missing
+
+# 6. Build & sanity-check the distribution
 python -m build
+twine check dist/*
 
-# 5. Test package
-pip install dist/owlbot_remote-1.1.0-py3-none-any.whl
-owlbot --help
-
-# 6. Publish to PyPI
-pip install twine
-twine upload dist/*
-
-# 7. Git tag
-git tag -a v1.1.0 -m "Release v1.1.0"
+# 7. Commit, tag, push
+git add -A && git commit -m "chore: release v1.1.0"
+git push origin main
+git tag -a v1.1.0 -m "OwlBot v1.1.0"
 git push origin v1.1.0
 
-# 8. GitHub Release
-# Go to GitHub → Releases → Create new release
-# Tag: v1.1.0
-# Title: OwlBot v1.1.0
-# Description: Copy from CHANGELOG.md
+# 8. Create the GitHub Release (this is what triggers PyPI publishing)
+gh release create v1.1.0 dist/owlbot_remote-1.1.0-py3-none-any.whl \
+  dist/owlbot_remote-1.1.0.tar.gz \
+  --title "OwlBot v1.1.0" \
+  --notes-file RELEASE_NOTES_v1.1.0.md
+
+# 9. Confirm it actually reached PyPI
+pip index versions owlbot-remote --pre --no-cache-dir
 ```
 
-### CI/CD Pipeline (`.github/workflows/python-package.yml`)
+### CI/CD Pipeline (actual files)
 
-```yaml
-name: Python Package
+Two separate workflows, both in `.github/workflows/`:
 
-on:
-  push:
-    tags: ['v*']
-  pull_request:
+- **`python-package.yml`** — runs on every push/PR to `main` and on manual
+  dispatch. `runs-on: ubuntu-latest`, matrix `python-version: ["3.11",
+  "3.12"]` (these are the only two versions declared in `pyproject.toml`
+  classifiers — there is no 3.13 support yet). Steps: install
+  `-e ".[dev]"` → flake8 (critical errors block the build; full style scan
+  is non-blocking) → mypy (advisory, non-blocking) → `pytest -v
+  --cov=owlbot`. A second `build` job (needs `test`) runs `python -m
+  build` + `twine check` and uploads the `dist/` artifacts.
+- **`python-publish.yml`** — triggers only `on: release: published`.
+  Builds the distribution again from a clean checkout, runs `twine check`,
+  then publishes via `pypa/gh-action-pypi-publish` using **trusted OIDC
+  publishing** (`permissions: id-token: write`) — there is no
+  `TWINE_PASSWORD`/API-token secret involved, so publishing only ever
+  happens by creating a GitHub Release, never by running `twine upload`
+  locally.
 
-jobs:
-  test:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version: ['3.11', '3.12', '3.13']
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: pip install -e .[dev,all]
-      - run: flake8 src tests
-      - run: mypy src
-      - run: pytest --cov=owlbot
-
-  publish:
-    needs: test
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install build twine
-      - run: python -m build
-      - run: twine upload dist/*
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-```
+> ⚠️ PyPI rejects re-uploading a filename that was already published
+> (`400 File already exists`). If a publish run fails for that reason, it
+> almost always means the version number wasn't bumped, or that release
+> was already published successfully before — check PyPI first, don't
+> just re-run the workflow.
 
 ---
 

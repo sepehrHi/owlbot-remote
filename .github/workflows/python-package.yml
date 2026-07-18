@@ -42,6 +42,10 @@ jobs:
       - name: Lint with flake8 (style — non-blocking)
         run: flake8 src tests --count --exit-zero --statistics
 
+      - name: Type check with mypy (advisory — non-blocking)
+        run: mypy src --no-error-summary || echo "::warning::mypy found type issues (non-blocking, see log above)"
+        continue-on-error: true
+
       - name: Run test suite
         run: pytest -v --cov=owlbot --cov-report=term-missing
 
