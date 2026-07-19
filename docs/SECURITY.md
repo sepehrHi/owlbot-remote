@@ -376,10 +376,9 @@ sudo journalctl -u owlbot -f
 
 Found a security issue? Please report responsibly:
 
-1. **Do not** open a public issue
-2. Email: **security@sepehrhi.ir** (or GitHub Security Advisories)
-3. Include: Description, reproduction steps, impact assessment
-4. We'll acknowledge within 48 hours and coordinate fix
+1. open a public issue
+2. Include: Description, reproduction steps, impact assessment
+3. We'll acknowledge within 48 hours and coordinate fix
 
 ---
 
