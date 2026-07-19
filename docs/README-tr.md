@@ -12,7 +12,9 @@
 - 📊 **Canlı kaynak izleme** (CPU, RAM, Disk, sıcaklık)
 - 🎹 **Çevre birimi kontrolü** — klavye, fare, kısayollar, ses seviyesi
 - 📸 **Ekran yakalama, webcam, zamanlayıcı çekim ve ekran yayını**
-- 🔊 **Ses kaydı, ses seviyesi kontrolü ve gelen ses mesajları oynatma**
+- 🔊 **Ses kaydı, ses seviyesi kontrolü ve gelen sesli mesaj oynatma**
+- 🌍 **IP lookup, VPN/proxy detection, and GPS/IP-based location** (Telegram map pin)
+- 🌍 **IP lookup, VPN/proxy detection, and GPS/IP-based location** (Telegram map pin)
 
 ---
 
@@ -123,8 +125,17 @@ owlbot --token TOKEN --users 123 --disable-logging    # tamamen sessiz
 | | `/run` / `/cmd` / `/script` | Komutları çalıştır |
 | **monitoring** | `/monitor <cpu\|ram\|disk\|temp>` | Periyodik uyarılar |
 | | `/stopmonitor` | Uyarıları durdur |
-| **network** | `/wifiscan` | Wi-Fi ağlarını tara |
+| **network** | `/netcheck` | İnternet bağlantısını kontrol et |
+| | `/wifiscan` | Wi-Fi ağlarını tara |
 | | `/clipboard get\|set` | Panoya oku/yaz |
+| **ffmpeg** | `/ffmpeg` | FFmpeg durumunu kontrol et |
+| | `/ffmpeg_install` | FFmpeg'i indir ve kur |
+| **ip** | `/myip` | Genel + yerel IP adresleri |
+| | `/iplookup [ip]` | Coğrafi/ISP sorgulama (kendi veya verilen IP) |
+| | `/vpncheck` | VPN/proxy/hosting IP'sini algıla |
+| | `/location` | IP tabanlı konum pimi gönder |
+| | `/gps` | Gerçek GPS (Windows), IP yedekleme |
+| | `/locationlive <sec>` | N saniye canlı konum |
 
 ---
 
@@ -146,8 +157,9 @@ owlbot/
 │   ├── processes.py      # Süreç yönetimi
 │   ├── input.py          # Klavye/fare (Windows)
 │   ├── audio.py          # Ses kontrolü (Windows)
-│   ├── monitoring.py     # Kaynak izleme
-│   └── network.py        # Wi‑Fi / panoya
+│   ├── monitoring.py     # Resource monitoring
+│   ├── network.py        # Wi‑Fi / clipboard
+│   └── ip.py             # IP lookup, VPN check, GPS/IP location
 └── platform/
     └── telegram.py       # Telegram adaptörü
 ```
@@ -185,6 +197,59 @@ flake8 src tests
 ## 📄 Lisans
 
 **MIT Lisansı** altında dağıtılmaktadır. Detaylar için `LICENSE` dosyasına bakın.
+
+---
+
+---
+
+## 📚 Documentation
+
+All guides and API references are in the [`docs/`](docs/) directory (English only):
+
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](docs/GETTING_STARTED.md) | Installation, configuration, quick start |
+| [Configuration](docs/CONFIGURATION.md) | Complete configuration reference |
+| [Modules](docs/MODULES.md) | All modules, commands, and features |
+| [API Reference](docs/API.md) | Python API reference |
+| [Security](docs/SECURITY.md) | Security best practices |
+| [Development](docs/DEVELOPMENT.md) | Contributing, testing, releasing |
+| [Examples](docs/EXAMPLES.md) | Usage examples and patterns |
+| [Documentation Index](docs/INDEX.md) | Full documentation index |
+
+### 🌐 Translations (README only)
+
+All technical docs are English-only. README translations are in [`docs/`](docs/):
+
+| Language | File |
+|----------|------|
+| 🇮🇷 Persian/Farsi | [README-fa.md](docs/README-fa.md) |
+| 🇪🇸 Spanish | [README-es.md](docs/README-es.md) |
+| 🇮🇹 Italian | [README-it.md](docs/README-it.md) |
+| 🇩🇪 German | [README-de.md](docs/README-de.md) |
+| 🇨🇳 Chinese (Simplified) | [README-zh.md](docs/README-zh.md) |
+| 🇫🇷 French | [README-fr.md](docs/README-fr.md) |
+| 🇷🇺 Russian | [README-ru.md](docs/README-ru.md) |
+| 🇯🇵 Japanese | [README-ja.md](docs/README-ja.md) |
+| 🇳🇱 Dutch | [README-nl.md](docs/README-nl.md) |
+| 🇹🇷 Turkish | [README-tr.md](docs/README-tr.md) |
+| 🇰🇷 Korean | [README-ko.md](docs/README-ko.md) |
+
+---
+
+## ⚠️ Disclaimer
+
+This library is provided for your own convenience — to remotely manage
+**your own** devices that you own or are explicitly authorized to
+administer. It is not intended for surveillance, monitoring, or control
+of any device or person without their knowledge and consent.
+
+Any misuse of this library (including unauthorized access to systems you
+do not own, tracking or monitoring individuals without consent, or any
+illegal activity) is solely the responsibility of the user. The author
+and maintainer(s) are not liable for any misuse, damages, or legal
+consequences arising from the use of this software. Use responsibly and
+in accordance with the laws of your jurisdiction.
 
 ---
 

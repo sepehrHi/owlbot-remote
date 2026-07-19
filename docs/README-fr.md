@@ -13,6 +13,8 @@
 - 🎹 **Contrôle des périphériques** — clavier, souris, raccourcis, volume audio
 - 📸 **Capture d'écran, webcam, timelapse et streaming d'écran**
 - 🔊 **Enregistrement vocal, contrôle du volume et lecture des messages vocaux entrants**
+- 🌍 **IP lookup, VPN/proxy detection, and GPS/IP-based location** (Telegram map pin)
+- 🌍 **IP lookup, VPN/proxy detection, and GPS/IP-based location** (Telegram map pin)
 
 ---
 
@@ -121,10 +123,19 @@ owlbot --token TOKEN --users 123 --disable-logging    # complètement silencieux
 | **processes** | `/tasklist` | Lister les processus |
 | | `/killtask <exe>` | Tuer un processus |
 | | `/run` / `/cmd` / `/script` | Exécuter des commandes |
-| **monitoring** | `/monitor <cpu\|ram\|disk\|temp>` | Alertes périodiques |
-| | `/stopmonitor` | Arrêter les alertes |
-| **network** | `/wifiscan` | Scanner les réseaux Wi‑Fi |
-| | `/clipboard get\|set` | Lire/écrire le presse-papiers |
+| **monitoring** | `/monitor <cpu\|ram\|disk\|temp>` | Periodic alerts |
+| | `/stopmonitor` | Stop alerts |
+| **network** | `/netcheck` | Check internet connection |
+| | `/wifiscan` | Scan Wi‑Fi networks |
+| | `/clipboard get\|set` | Read / write clipboard |
+| **ffmpeg** | `/ffmpeg` | Check FFmpeg status |
+| | `/ffmpeg_install` | Download & install FFmpeg |
+| **ip** | `/myip` | Public + local IP addresses |
+| | `/iplookup [ip]` | Geo/ISP lookup (self or given IP) |
+| | `/vpncheck` | Detect VPN/proxy/hosting IP |
+| | `/location` | Send IP-based location pin |
+| | `/gps` | Real GPS fix (Windows), IP fallback |
+| | `/locationlive <sec>` | Live location for N seconds |
 
 ---
 
@@ -146,8 +157,9 @@ owlbot/
 │   ├── processes.py      # Gestion processus
 │   ├── input.py          # Clavier/souris (Windows)
 │   ├── audio.py          # Contrôle audio (Windows)
-│   ├── monitoring.py     # Surveillance ressources
-│   └── network.py        # Wi‑Fi / presse-papiers
+│   ├── monitoring.py     # Resource monitoring
+│   ├── network.py        # Wi‑Fi / clipboard
+│   └── ip.py             # IP lookup, VPN check, GPS/IP location
 └── platform/
     └── telegram.py       # Adaptateur Telegram
 ```
@@ -185,6 +197,59 @@ flake8 src tests
 ## 📄 Licence
 
 Distribué sous **Licence MIT**. Voir `LICENSE` pour détails.
+
+---
+
+---
+
+## 📚 Documentation
+
+All guides and API references are in the [`docs/`](docs/) directory (English only):
+
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](docs/GETTING_STARTED.md) | Installation, configuration, quick start |
+| [Configuration](docs/CONFIGURATION.md) | Complete configuration reference |
+| [Modules](docs/MODULES.md) | All modules, commands, and features |
+| [API Reference](docs/API.md) | Python API reference |
+| [Security](docs/SECURITY.md) | Security best practices |
+| [Development](docs/DEVELOPMENT.md) | Contributing, testing, releasing |
+| [Examples](docs/EXAMPLES.md) | Usage examples and patterns |
+| [Documentation Index](docs/INDEX.md) | Full documentation index |
+
+### 🌐 Translations (README only)
+
+All technical docs are English-only. README translations are in [`docs/`](docs/):
+
+| Language | File |
+|----------|------|
+| 🇮🇷 Persian/Farsi | [README-fa.md](docs/README-fa.md) |
+| 🇪🇸 Spanish | [README-es.md](docs/README-es.md) |
+| 🇮🇹 Italian | [README-it.md](docs/README-it.md) |
+| 🇩🇪 German | [README-de.md](docs/README-de.md) |
+| 🇨🇳 Chinese (Simplified) | [README-zh.md](docs/README-zh.md) |
+| 🇫🇷 French | [README-fr.md](docs/README-fr.md) |
+| 🇷🇺 Russian | [README-ru.md](docs/README-ru.md) |
+| 🇯🇵 Japanese | [README-ja.md](docs/README-ja.md) |
+| 🇳🇱 Dutch | [README-nl.md](docs/README-nl.md) |
+| 🇹🇷 Turkish | [README-tr.md](docs/README-tr.md) |
+| 🇰🇷 Korean | [README-ko.md](docs/README-ko.md) |
+
+---
+
+## ⚠️ Disclaimer
+
+This library is provided for your own convenience — to remotely manage
+**your own** devices that you own or are explicitly authorized to
+administer. It is not intended for surveillance, monitoring, or control
+of any device or person without their knowledge and consent.
+
+Any misuse of this library (including unauthorized access to systems you
+do not own, tracking or monitoring individuals without consent, or any
+illegal activity) is solely the responsibility of the user. The author
+and maintainer(s) are not liable for any misuse, damages, or legal
+consequences arising from the use of this software. Use responsibly and
+in accordance with the laws of your jurisdiction.
 
 ---
 

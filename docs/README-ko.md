@@ -12,7 +12,9 @@
 - 📊 **실시간 리소스 모니터링** (CPU, RAM, 디스크, 온도)
 - 🎹 **주변기기 제어** — 키보드, 마우스, 단축키, 오디오 볼륨
 - 📸 **화면 캡처, 웹캠, 타임랩스, 화면 스트리밍**
-- 🔊 **음성 녹음, 볼륨 제어, 수신 음성 메시지 재생**
+- 🔊 **음성 녹음, 볼륨 제어, 수신 음성 재생**
+- 🌍 **IP lookup, VPN/proxy detection, and GPS/IP-based location** (Telegram map pin)
+- 🌍 **IP lookup, VPN/proxy detection, and GPS/IP-based location** (Telegram map pin)
 
 ---
 
@@ -123,8 +125,17 @@ owlbot --token 토큰 --users 123 --disable-logging    # 완전 무음
 | | `/run` / `/cmd` / `/script` | 명령 실행 |
 | **monitoring** | `/monitor <cpu\|ram\|disk\|temp>` | 주기적 알림 |
 | | `/stopmonitor` | 알림 중지 |
-| **network** | `/wifiscan` | Wi-Fi 네트워크 스캔 |
+| **network** | `/netcheck` | 인터넷 연결 확인 |
+| | `/wifiscan` | Wi-Fi 네트워크 스캔 |
 | | `/clipboard get\|set` | 클립보드 읽기/쓰기 |
+| **ffmpeg** | `/ffmpeg` | FFmpeg 상태 확인 |
+| | `/ffmpeg_install` | FFmpeg 다운로드 및 설치 |
+| **ip** | `/myip` | 공개 + 로컬 IP 주소 |
+| | `/iplookup [ip]` | 지리/ISP 조회 (자체 또는 지정 IP) |
+| | `/vpncheck` | VPN/프록시/호스팅 IP 감지 |
+| | `/location` | IP 기반 위치 핀 전송 |
+| | `/gps` | 실제 GPS (Windows), IP 폴백 |
+| | `/locationlive <sec>` | N초 동안 라이브 위치 |
 
 ---
 
@@ -146,8 +157,9 @@ owlbot/
 │   ├── processes.py      # 프로세스 관리
 │   ├── input.py          # 키보드/마우스 (Windows)
 │   ├── audio.py          # 오디오 제어 (Windows)
-│   ├── monitoring.py     # 리소스 모니터링
-│   └── network.py        # Wi‑Fi / 클립보드
+│   ├── monitoring.py     # Resource monitoring
+│   ├── network.py        # Wi‑Fi / clipboard
+│   └── ip.py             # IP lookup, VPN check, GPS/IP location
 └── platform/
     └── telegram.py       # 텔레그램 어댑터
 ```
@@ -185,6 +197,59 @@ flake8 src tests
 ## 📄 라이선스
 
 **MIT 라이선스** 하에 배포. 자세한 내용은 `LICENSE` 참조.
+
+---
+
+---
+
+## 📚 Documentation
+
+All guides and API references are in the [`docs/`](docs/) directory (English only):
+
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](docs/GETTING_STARTED.md) | Installation, configuration, quick start |
+| [Configuration](docs/CONFIGURATION.md) | Complete configuration reference |
+| [Modules](docs/MODULES.md) | All modules, commands, and features |
+| [API Reference](docs/API.md) | Python API reference |
+| [Security](docs/SECURITY.md) | Security best practices |
+| [Development](docs/DEVELOPMENT.md) | Contributing, testing, releasing |
+| [Examples](docs/EXAMPLES.md) | Usage examples and patterns |
+| [Documentation Index](docs/INDEX.md) | Full documentation index |
+
+### 🌐 Translations (README only)
+
+All technical docs are English-only. README translations are in [`docs/`](docs/):
+
+| Language | File |
+|----------|------|
+| 🇮🇷 Persian/Farsi | [README-fa.md](docs/README-fa.md) |
+| 🇪🇸 Spanish | [README-es.md](docs/README-es.md) |
+| 🇮🇹 Italian | [README-it.md](docs/README-it.md) |
+| 🇩🇪 German | [README-de.md](docs/README-de.md) |
+| 🇨🇳 Chinese (Simplified) | [README-zh.md](docs/README-zh.md) |
+| 🇫🇷 French | [README-fr.md](docs/README-fr.md) |
+| 🇷🇺 Russian | [README-ru.md](docs/README-ru.md) |
+| 🇯🇵 Japanese | [README-ja.md](docs/README-ja.md) |
+| 🇳🇱 Dutch | [README-nl.md](docs/README-nl.md) |
+| 🇹🇷 Turkish | [README-tr.md](docs/README-tr.md) |
+| 🇰🇷 Korean | [README-ko.md](docs/README-ko.md) |
+
+---
+
+## ⚠️ Disclaimer
+
+This library is provided for your own convenience — to remotely manage
+**your own** devices that you own or are explicitly authorized to
+administer. It is not intended for surveillance, monitoring, or control
+of any device or person without their knowledge and consent.
+
+Any misuse of this library (including unauthorized access to systems you
+do not own, tracking or monitoring individuals without consent, or any
+illegal activity) is solely the responsibility of the user. The author
+and maintainer(s) are not liable for any misuse, damages, or legal
+consequences arising from the use of this software. Use responsibly and
+in accordance with the laws of your jurisdiction.
 
 ---
 

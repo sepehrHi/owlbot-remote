@@ -13,6 +13,7 @@
 - 🎹 **Peripherie-Steuerung** — Tastatur, Maus, Hotkeys, Audio-Lautstärke
 - 📸 **Bildschirmaufnahme, Webcam, Timelapse und Bildschirm-Streaming**
 - 🔊 **Sprachaufnahme, Lautstärkeregelung und Wiedergabe eingehender Sprachnachrichten**
+- 🌍 **IP-Abfrage, VPN/Proxy-Erkennung und GPS/IP-basierte Standortermittlung** (Telegram-Kartenpin)
 
 ---
 
@@ -123,8 +124,17 @@ owlbot --token TOKEN --users 123 --disable-logging    # komplett stumm
 | | `/run` / `/cmd` / `/script` | Befehle ausführen |
 | **monitoring** | `/monitor <cpu\|ram\|disk\|temp>` | Periodische Alerts |
 | | `/stopmonitor` | Alerts stoppen |
-| **network** | `/wifiscan` | Wi-Fi-Netze scannen |
+| **network** | `/netcheck` | Internetverbindung prüfen |
+| | `/wifiscan` | Wi-Fi-Netze scannen |
 | | `/clipboard get\|set` | Zwischenablage lesen/schreiben |
+| **ffmpeg** | `/ffmpeg` | FFmpeg-Status prüfen |
+| | `/ffmpeg_install` | FFmpeg herunterladen & installieren |
+| **ip** | `/myip` | Öffentliche + lokale IP-Adressen |
+| | `/iplookup [ip]` | Geo/ISP-Abfrage (eigene oder angegebene IP) |
+| | `/vpncheck` | VPN/Proxy/Hosting-IP erkennen |
+| | `/location` | IP-basierten Standortpin senden |
+| | `/gps` | Echter GPS-Fix (Windows), IP-Fallback |
+| | `/locationlive <sec>` | Live-Standort für N Sekunden |
 
 ---
 
@@ -147,7 +157,8 @@ owlbot/
 │   ├── input.py          # Tastatur/Maus (Windows)
 │   ├── audio.py          # Audio-Steuerung (Windows)
 │   ├── monitoring.py     # Ressourcenüberwachung
-│   └── network.py        # Wi‑Fi / Zwischenablage
+│   ├── network.py        # Wi‑Fi / Zwischenablage
+│   └── ip.py             # IP lookup, VPN check, GPS/IP location
 └── platform/
     └── telegram.py       # Telegram-Adapter
 ```
@@ -185,6 +196,59 @@ flake8 src tests
 ## 📄 Lizenz
 
 Vertrieben unter der **MIT-Lizenz**. Siehe `LICENSE` für Details.
+
+---
+
+---
+
+## 📚 Documentation
+
+All guides and API references are in the [`docs/`](docs/) directory:
+
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](docs/GETTING_STARTED.md) | Installation, configuration, quick start |
+| [Configuration](docs/CONFIGURATION.md) | Complete configuration reference |
+| [Modules](docs/MODULES.md) | All modules, commands, and features |
+| [API Reference](docs/API.md) | Python API reference |
+| [Security](docs/SECURITY.md) | Security best practices |
+| [Development](docs/DEVELOPMENT.md) | Contributing, testing, releasing |
+| [Examples](docs/EXAMPLES.md) | Usage examples and patterns |
+| [Documentation Index](docs/INDEX.md) | Full documentation index |
+
+### 🌐 Translations (README only)
+
+All technical docs are English-only. README translations are in [`docs/`](docs/):
+
+| Language | File |
+|----------|------|
+| 🇮🇷 Persian/Farsi | [README-fa.md](docs/README-fa.md) |
+| 🇪🇸 Spanish | [README-es.md](docs/README-es.md) |
+| 🇮🇹 Italian | [README-it.md](docs/README-it.md) |
+| 🇩🇪 German | [README-de.md](docs/README-de.md) |
+| 🇨🇳 Chinese (Simplified) | [README-zh.md](docs/README-zh.md) |
+| 🇫🇷 French | [README-fr.md](docs/README-fr.md) |
+| 🇷🇺 Russian | [README-ru.md](docs/README-ru.md) |
+| 🇯🇵 Japanese | [README-ja.md](docs/README-ja.md) |
+| 🇳🇱 Dutch | [README-nl.md](docs/README-nl.md) |
+| 🇹🇷 Turkish | [README-tr.md](docs/README-tr.md) |
+| 🇰🇷 Korean | [README-ko.md](docs/README-ko.md) |
+
+---
+
+## ⚠️ Disclaimer
+
+This library is provided for your own convenience — to remotely manage
+**your own** devices that you own or are explicitly authorized to
+administer. It is not intended for surveillance, monitoring, or control
+of any device or person without their knowledge and consent.
+
+Any misuse of this library (including unauthorized access to systems you
+do not own, tracking or monitoring individuals without consent, or any
+illegal activity) is solely the responsibility of the user. The author
+and maintainer(s) are not liable for any misuse, damages, or legal
+consequences arising from the use of this software. Use responsibly and
+in accordance with the laws of your jurisdiction.
 
 ---
 
