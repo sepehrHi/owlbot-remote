@@ -4,16 +4,44 @@
 فرمت بر اساس [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) است و
 این پروژه از [Semantic Versioning](https://semver.org/) پیروی می‌کند.
 
-## [Unreleased]
+## [1.0.3] - 2026-07-20
+
+### ✨ Fourth release — real GPS-based live location
 
 ### Added
-- دو دستور جدید به ماژول `ip`:
-  - `/gpslive <sec>` — لوکیشن لایوِ واقعی مبتنی بر GPS؛ به‌جای یک پین ثابت،
-    هر ۱۵ ثانیه دوباره از Windows Location Services فیکس می‌گیره و همون
-    پیامِ live-location رو آپدیت می‌کنه (برخلاف `/locationlive` که مبتنی بر
-    IP و ثابته). اگه GPS واقعی در دسترس نبود، به‌صورت خودکار یک پین
-    IP-based (غیر لایو) می‌فرسته.
-  - `/stopgpslive` — توقف زودهنگام ردیابی لایو GPS.
+- دو دستور جدید در ماژول `ip` (`src/owlbot/modules/ip.py`):
+  - **`/gpslive <seconds>`** (۶۰ تا ۸۶۴۰۰ ثانیه) — برخلاف `/locationlive`
+    که مبتنی بر IP و کاملاً ثابت است، این دستور یک **ردیابی زنده‌ی واقعی**
+    راه می‌اندازد:
+    1. ابتدا یک فیکس GPS واقعی از طریق `System.Device.Location.GeoCoordinateWatcher`
+       (Windows Location Services) می‌گیرد و با `bot.send_location(...,
+       live_period=seconds)` یک پیام live-location در تلگرام می‌فرستد.
+    2. یک ترد پس‌زمینه (`daemon=True`، همان الگوی `MonitoringModule`)
+       هر **۱۵ ثانیه** (`_GPS_LIVE_POLL_SECONDS`) دوباره GPS را poll
+       می‌کند و با `bot.edit_message_live_location(...)` **همان پیام** را
+       در جا آپدیت می‌کند — یعنی اگر دستگاه (مثلاً لپ‌تاپ) واقعاً جابه‌جا
+       شود، پین روی نقشه هم دنبالش می‌رود.
+    3. اگر در لحظه‌ی شروع GPS واقعی در دسترس نباشد (مجوز رد شده یا سرویس
+       غیرفعال)، به‌صورت خودکار یک پین **غیر لایو** مبتنی بر IP (همان
+       منطق fallback موجود در `/gps`) ارسال می‌شود؛ در طول اجرا هم اگر یک
+       poll خاص فیکس نگیرد، آخرین موقعیت شناخته‌شده حفظ می‌شود (به‌جای قطع
+       ردیابی).
+    4. با پایان زمان تعیین‌شده یا فراخوانی `/stopgpslive`، ترد متوقف و
+       `bot.stop_message_live_location(...)` فراخوانی می‌شود.
+  - **`/stopgpslive`** — توقف زودهنگام یک نشست فعال `/gpslive` (پیام خطای
+    مناسب می‌دهد اگر نشست فعالی وجود نداشته باشد).
+- وضعیت نشست لایو (`_gps_live_active: bool`, `_gps_live_thread: threading.Thread | None`)
+  به‌عنوان state روی نمونه‌ی `IPModule` نگه‌داری می‌شود (دقیقاً همان الگوی
+  `_active`/`_thread` در `MonitoringModule`)، نه global state، تا هر
+  instance از بات مستقل بماند.
+- ۱ تست واحد جدید (`test_init_gps_live_state_is_idle`) برای بررسی وضعیت
+  اولیه‌ی idle این state.
+
+### Changed
+- `/help` (`core/help.py`)، `README.md` (بولت فیچرها + جدول ماژول‌ها) و
+  `docs/MODULES.md` (بخش کامل ماژول IP & Location) با دو دستور جدید و
+  توضیح تفاوت `/locationlive` (IP-based، ثابت) در برابر `/gpslive`
+  (GPS واقعی، لایو و به‌روزرسانی‌شونده) به‌روزرسانی شدند.
 
 ## [1.0.2] - 2026-07-19
 
@@ -97,6 +125,7 @@
 - بخش سخت‌گیری‌های امنیتی (اعتبارسنجی عمیق ورودی، rate limiting و ...) در
   این نسخه به‌طور آگاهانه به نسخه‌های بعدی موکول شده است.
 
+[1.0.3]: https://github.com/sepehrHi/OwlBot/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/sepehrHi/OwlBot/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/sepehrHi/OwlBot/compare/v1.0.0-beta.0...v1.0.1
 [1.0.0-beta.0]: https://github.com/sepehrHi/OwlBot/releases/tag/v1.0.0-beta.0
